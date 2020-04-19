@@ -16,8 +16,9 @@ var bfTokens = []bf.Token{
 	bf.Read, bf.Write, bf.Open, bf.Close,
 }
 
-type bfLexer struct {
-	gen Generator
+// BfLexer is a lexer for brainfuck reading from gene
+type BfLexer struct {
+	Gen Generator
 }
 
 // Option is an optional setting for the internal brainfuck interpreter.
@@ -30,8 +31,8 @@ var (
 	SetOutput     = bf.SetOutput
 )
 
-func (l bfLexer) Next() bf.Token {
-	return bfTokens[l.gen.Generate()&7] // 7 masks the bottom 3 bits
+func (l BfLexer) Next() bf.Token {
+	return bfTokens[l.Gen.Generate()&7] // 7 masks the bottom 3 bits
 }
 
 // NewInterpreter returns a new Interpreter which runs on a brainfuck program
@@ -39,7 +40,7 @@ func (l bfLexer) Next() bf.Token {
 // The default options are equal to github.com/nakario/braintwist/brainfuck#Interpreter
 func NewInterpreter(g Generator, options ...Option) *Interpreter {
 	return &Interpreter{
-		bfi: bf.NewInterpreter(&bfLexer{gen: g}, options...),
+		bfi: bf.NewInterpreter(&BfLexer{Gen: g}, options...),
 	}
 }
 

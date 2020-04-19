@@ -2,7 +2,6 @@ package braintwist
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -52,7 +51,7 @@ func (l *Lexer) Next() Node {
 		l.pos++
 		c, err := l.reader.ReadByte()
 		if err != nil {
-			if errors.Is(err, io.EOF) {
+			if err == io.EOF {
 				if numeral.Len() > 0 {
 					l.pos--
 					num := numeral.String()

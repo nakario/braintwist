@@ -70,7 +70,7 @@ braintwistでは、メルセンヌ・ツイスタのシード値を指定する�
 
 ## インストール方法
 
-Requirements: Go 1.13 or later
+Requirements: Go 1.12 or later
 
 ```bash
 $ go get -u github.com/nakario/braintwist/cmd/braintwist

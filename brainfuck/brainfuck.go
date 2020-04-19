@@ -58,7 +58,7 @@ func (l lexer) Next() Token {
 	for {
 		c := make([]byte, 1)
 		if _, err := l.r.Read(c); err != nil {
-			if errors.Is(err, io.EOF) {
+			if err == io.EOF {
 				return EOF
 			}
 			panic(fmt.Errorf("brainfuck lexer: unexpected error while reading source code: %w", err))
@@ -190,7 +190,7 @@ func (p *Interpreter) Step() (finished bool, err error) {
 	}()
 	t, err := p.tokens.next()
 	if err != nil {
-		if errors.Is(err, io.EOF) {
+		if err == io.EOF {
 			return true, nil
 		}
 		return false, err
@@ -218,7 +218,7 @@ func (p *Interpreter) Step() (finished bool, err error) {
 		}
 	case Close:
 		if err := p.close(); err != nil {
-			if errors.Is(err, ErrBOT) {
+			if err == ErrBOT {
 				return true, nil
 			}
 			return false, err
@@ -246,7 +246,7 @@ func (p *Interpreter) prev() {
 func (p *Interpreter) read() error {
 	b, err := p.reader.ReadByte()
 	if err != nil {
-		if errors.Is(err, io.EOF) {
+		if err == io.EOF {
 			b = 0
 		} else {
 			return err
