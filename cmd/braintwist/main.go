@@ -23,16 +23,16 @@ func main() {
 	source := flag.Arg(0)
 	f, err := os.Open(source)
 	if err != nil {
-		fmt.Println("failed to open source code:", err)
+		fmt.Fprintln(os.Stderr, "Error: failed to open source code:", err)
 		os.Exit(1)
 	}
 	prog, err := bt.Compile(f, bt.SetMemorySize(*memSize))
 	if err != nil {
-		fmt.Println("failed to compile program:", err)
+		fmt.Fprintln(os.Stderr, "Error: failed to compile program:", err)
 		os.Exit(1)
 	}
 	if err := prog.Run(); err != nil {
-		fmt.Println("runtime error:", err)
+		fmt.Fprintln(os.Stderr, "Error: runtime error:", err)
 		os.Exit(1)
 	}
 }
