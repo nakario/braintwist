@@ -85,4 +85,4 @@ $ braintwist example.bt
 
 ## メルセンヌ・ツイスタ
 
-メルセンヌ・ツイスタは[提案者が公開する64bitマシン用コード](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/mt64.html)と互換性のある[Go実装](https://github.com/seehuhn/mt19937)を使用します。シード値 `5489` を指定したときに `10000` 番目に生成される値が `9981545732273789042` であることが要求されます。
+メルセンヌ・ツイスタは[提案者が公開する64bitマシン用コード](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/mt64.html)と互換性のある[Go実装](https://github.com/seehuhn/mt19937)を使用します。シード値 `5489` を指定したときに `10000` 番目に生成される値が `9981545732273789042` であることが保証されます。
