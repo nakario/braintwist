@@ -10,6 +10,7 @@ import (
 
 var (
 	memSize = flag.Int("memSize", 30000, "number of memory cells")
+	eof = flag.Int("eof", 0, "value of EOF (0-255)")
 )
 
 func main() {
@@ -26,7 +27,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Error: failed to open source code:", err)
 		os.Exit(1)
 	}
-	prog, err := bt.Compile(f, bt.SetMemorySize(*memSize))
+	prog, err := bt.Compile(f, bt.SetMemorySize(*memSize), bt.SetEOF(byte(*eof)))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error: failed to compile program:", err)
 		os.Exit(1)
