@@ -38,6 +38,10 @@ var validTokens = []Token{Inc, Dec, Next, Prev, Read, Write, Open, Close}
 // any Open token corresponding to it.
 var ErrBOT = errors.New("beggining of tokens")
 
+// ErrInvalidAddress is an error returned by operations +-.,[] when they
+// dereference the pointer and it points out of the memory.
+var ErrInvalidAddress = errors.New("invalid cell address dereference")
+
 // Lexer reads Tokens from a source code.
 type Lexer interface {
 	Next() Token
@@ -86,13 +90,23 @@ func newTokenBuffer(l Lexer) *tokenBuffer {
 	}
 }
 
-func (tb *tokenBuffer) next() (Token, error) {
+func (tb *tokenBuffer) next() (t Token, err error) {
 	if tb.pos < len(tb.buffer) {
-		t := tb.buffer[tb.pos]
+		t = tb.buffer[tb.pos]
 		tb.pos++
 		return t, nil
 	}
-	t := tb.lex.Next()
+	// tb.lex.Next() may cause a panic
+	defer func(){
+		if rerr := recover(); rerr != nil {
+			t = Unknown
+			var ok bool
+			if err, ok = rerr.(error); !ok {
+				err = fmt.Errorf("unknown error")
+			}
+		}
+	}()
+	t = tb.lex.Next()
 	if t == EOF {
 		return EOF, io.EOF
 	}
@@ -133,6 +147,13 @@ func SetOutput(output io.Writer) Option {
 	})
 }
 
+// SetEOF sets the value of EOF.
+func SetEOF(value byte) Option {
+	return Option(func(p *Interpreter) {
+		p.eof = value
+	})
+}
+
 // Interpreter is a runtime for a brainfuck program.
 type Interpreter struct {
 	tokens *tokenBuffer
@@ -140,11 +161,13 @@ type Interpreter struct {
 	ptr    int
 	reader *bufio.Reader
 	writer io.Writer
+	eof    byte
 }
 
 // NewInterpreter returns Interpreter running on tokens from Lexer.
 // The default memory size is 30000.
 // The default i/o is os.Stdin and os.Stdout.
+// The default EOF code is 0.
 func NewInterpreter(l Lexer, options ...Option) *Interpreter {
 	p := &Interpreter{
 		tokens: newTokenBuffer(l),
@@ -185,7 +208,7 @@ func (p *Interpreter) Step() (finished bool, err error) {
 	defer func() {
 		if rerr := recover(); rerr != nil {
 			// All panics recovered here should be "index out of range"
-			err = errors.New("invalid cell address")
+			err = ErrInvalidAddress
 		}
 	}()
 	t, err := p.tokens.next()
@@ -247,7 +270,7 @@ func (p *Interpreter) read() error {
 	b, err := p.reader.ReadByte()
 	if err != nil {
 		if err == io.EOF {
-			b = 0
+			b = p.eof
 		} else {
 			return err
 		}

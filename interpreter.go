@@ -29,6 +29,7 @@ var (
 	SetMemorySize = bf.SetMemorySize
 	SetInput      = bf.SetInput
 	SetOutput     = bf.SetOutput
+	SetEOF        = bf.SetEOF
 )
 
 func (l BfLexer) Next() bf.Token {
